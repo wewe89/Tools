@@ -3,7 +3,7 @@ import sys
 import io
 import json
 #获取用户信息
-def downloadFile(userid,Acct_Num,username,index):
+def downloadFile(userid,Acct_Num,username,index,startDate,endDate):
     url='http://10.128.1.137:8002/rsp/fastrpt/exp.do'
     headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                'Accept-Encoding': 'gzip, deflate',
@@ -23,8 +23,8 @@ def downloadFile(userid,Acct_Num,username,index):
               'paras': '{rptId=8a00804e57230095015741bbde701078, isExtemporeQuery=true, favoriteName=%E3%80%90new%E3%80%91%E5%AD%98%E6%AC%BE%E4%BA%A4%E6%98%93%E6%98%8E%E7%BB%86_%E5%AF%B9%E5%AE%A2, isQuery=true}',
               'p_cust_no': userid,
               'p_cust_no_RTRN_SQL_INFO': '##null',
-              'p_tx_date1': '2001-01-01',
-              'p_tx_date2': '2016-12-31',
+              'p_tx_date1': startDate,
+              'p_tx_date2': endDate,
               'p_in_acct_no': Acct_Num,
               'p_in_acct_no_RTRN_SQL_INFO': '##null',
               'Impt_Med_ID': '',
@@ -36,7 +36,7 @@ def downloadFile(userid,Acct_Num,username,index):
     open("监察委查询名单/"+str(index)+username+"【new】存款交易明细_对客.xls","wb").write(response.content)
     return
 #获取用户信息
-def getPersonAcct_Num(username,userId,cardNo):
+def getPersonAcct_Num(username,userId,cardNo,startDate,endDate):
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'zh-CN,zh;q=0.8',
@@ -58,8 +58,8 @@ def getPersonAcct_Num(username,userId,cardNo):
                 'paras': '{rptId=8a00804e57230095015741bbde701078, isExtemporeQuery=true, favoriteName=%E3%80%90new%E3%80%91%E5%AD%98%E6%AC%BE%E4%BA%A4%E6%98%93%E6%98%8E%E7%BB%86_%E5%AF%B9%E5%AE%A2, isQuery=true}',
                 'p_cust_no': userId,
                 'p_cust_no_RTRN_SQL_INFO': '##null',
-                'p_tx_date1': '2001-01-01',
-                'p_tx_date2': '2016-12-31',
+                'p_tx_date1': startDate,
+                'p_tx_date2': endDate,
                 'p_in_acct_no': '',
                 'p_in_acct_no_RTRN_SQL_INFO': '##null',
                 'Impt_Med_ID': cardNo,
@@ -85,7 +85,7 @@ def getPersonAcct_Num(username,userId,cardNo):
         index=index+1
     return
 #获取用户信息
-def getTotalNum(username,userId,accountNum,index):
+def getTotalNum(username,userId,accountNum,index,startDate,endDate):
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'zh-CN,zh;q=0.8',
@@ -107,8 +107,8 @@ def getTotalNum(username,userId,accountNum,index):
                 'paras': '{rptId=8a00804e57230095015741bbde701078, isExtemporeQuery=true, favoriteName=%E3%80%90new%E3%80%91%E5%AD%98%E6%AC%BE%E4%BA%A4%E6%98%93%E6%98%8E%E7%BB%86_%E5%AF%B9%E5%AE%A2, isQuery=true}',
                 'p_cust_no': userId,
                 'p_cust_no_RTRN_SQL_INFO': '##null',
-                'p_tx_date1': '2001-01-01',
-                'p_tx_date2': '2016-12-31',
+                'p_tx_date1': startDate,
+                'p_tx_date2': endDate,
                 'p_in_acct_no': accountNum,
                 'p_in_acct_no_RTRN_SQL_INFO': '##null',
                 'Impt_Med_ID': '',
@@ -127,7 +127,7 @@ def getTotalNum(username,userId,accountNum,index):
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
 # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-cookie_str = 'imoiaRspTopMenuType=big; imoiaRspLoginType=exp; __guid=165233471.4210132586760320500.1526280137524.9197; BIGipServerscbi_report_8002_pool=3456139274.17183.0000; ADMINCONSOLESESSION=E2jt1gMACyVF5VUpPvzQxum-BrotkcYgGlEYZla9vwRN9-uuV8!-1965563594'
+cookie_str = 'imoiaRspTopMenuType=big; imoiaRspLoginType=exp; __guid=165233471.4210132586760320500.1526280137524.9197; ADMINCONSOLESESSION=oBfxhUF5CJcU63cttx_H_bu9WY4JMtyO9kgozeeWBSPoW_0Fgq!21315747; BIGipServerscbi_report_8002_pool=3472916490.16927.0000'
 # 把cookie字符串处理成字典，以便接下来使用
 cookies = {}
 for line in cookie_str.split(';'):
