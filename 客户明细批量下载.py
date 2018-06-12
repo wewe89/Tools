@@ -148,9 +148,9 @@ for index, line in enumerate(file.readlines()):
     userid = lineinfo[3]
     cardNo = lineinfo[2]
     username = lineinfo[1]
-    Acct_Num = getPersonAcct_Num(username,userid,cardNo,startDate,endDate)
-    getTotalNum(username,userid,Acct_Num,lineinfo[0],startDate,endDate)
-    downloadFile(userid,Acct_Num,username,lineinfo[0],startDate,endDate)
+    Acct_Num = getPersonAcct_Num(username,userid,cardNo,startDate,endDate )
+    getTotalNum(username,userid,Acct_Num,lineinfo[0],startDate,endDate )
+    downloadFile(userid,Acct_Num,username,lineinfo[0],startDate,endDate )
 
 file.close()  # 关闭文件
 
