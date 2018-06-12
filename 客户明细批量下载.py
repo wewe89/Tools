@@ -141,14 +141,16 @@ for line in cookie_str.split(';'):
 # downloadFile(userid,Acct_Num)
 
 file = open("监察委查询名单.csv", "r")  # 打开文件
+startDate='2002-01-01'
+endDate='2018-06-12'
 for index, line in enumerate(file.readlines()):
     lineinfo=line.strip().split(",")
     userid = lineinfo[3]
     cardNo = lineinfo[2]
     username = lineinfo[1]
-    Acct_Num = getPersonAcct_Num(username,userid,cardNo)
-    getTotalNum(username,userid,Acct_Num,lineinfo[0])
-    downloadFile(userid,Acct_Num,username,lineinfo[0])
+    Acct_Num = getPersonAcct_Num(username,userid,cardNo,startDate,endDate)
+    getTotalNum(username,userid,Acct_Num,lineinfo[0],startDate,endDate)
+    downloadFile(userid,Acct_Num,username,lineinfo[0],startDate,endDate)
 
 file.close()  # 关闭文件
 
