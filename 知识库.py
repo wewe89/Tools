@@ -131,7 +131,7 @@ def main():
 
     db = connectdb()    # 连接MySQL数据库
 
-    createtable(db)     # 创建表
+    # createtable(db)     # 创建表
     insertdb(db)        # 插入数据
     print('\n插入数据后:')
     querydb(db)
