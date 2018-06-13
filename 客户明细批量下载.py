@@ -143,6 +143,7 @@ for line in cookie_str.split(';'):
 file = open("监察委查询名单.csv", "r")  # 打开文件
 startDate='2002-01-01'
 endDate='2018-06-12'
+
 for index, line in enumerate(file.readlines()):
     lineinfo=line.strip().split(",")
     userid = lineinfo[3]
