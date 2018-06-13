@@ -1,21 +1,10 @@
-import sys
-import io
-import json
-file = open("营业部.txt", "r")  # 打开文件
+import  re
 
-file1 = open("营业部1.txt", "w")  # 打开文件
+# str='季末可能会存现协同办公系统运行缓慢的情况，主要是因为季末报表查询较多（协同办公和报表共用数据库）！请大家避开高峰期使用!'
+str=u"【红豆杉】红豆杉作用与功效_红豆杉抗癌药品-健客网"
+re.split(u'【|】|-|_', str)
 
-allStr=file.read().replace('\\n', '')
+for i in re.split(u'【|】|-|_',  str):
+    print(i)
 
-data=json.loads(allStr)["nextgroup"]
-for index in range(len(data)):
-    line=data[index]["userList"]
-    if(line is not None):
-        for index1 in range(len(line)):
-            str1=line[index1]
-            # oneline=str["loginId"]+","+str["mail"]+","+str["mobile"]+","+str(str["userId"])+","+str["userId"]+"/n"
-            oneline=json.dumps(str1)
-            print(oneline)
-            file1.write(str1["loginId"]+","+str1["mail"]+","+str1["mobile"]+","+str(str1["userId"])+","+str(str1["userName"])+'\n')
-file1.close()
-file.close()  # 关闭文件
+
