@@ -160,7 +160,7 @@ def main():
     sourcetable = sourcedata.sheets()[0]
 
     lasttime=''
-
+    lastSystemid=''
     index = 0
     while index < sourcetable.nrows:
         # data_list用来存放数据
@@ -172,7 +172,12 @@ def main():
             createtime=lasttime
         else:
             createtime=lasttime
-        systemid = data_list[1]
+        # systemid = data_list[1]
+        if (data_list[1] != ""):
+            lastSystemid = data_list[1]
+            systemid = lastSystemid
+        else:
+            systemid = lastSystemid
         data=handleChar(data_list[2])
         issue = data[0]
         causes = data[1]
