@@ -2,7 +2,7 @@ import requests
 import sys
 import io
 import json
-
+import xlrd
 def getCookies():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
@@ -218,7 +218,7 @@ def getSCBICookie():
         key, value = line.split('=', 1)
         cookies[key] = value
     return cookies
-def batchHandle():
+def batchHandleCSV():
     file = open("明细表.csv", "r")  # 打开文件
     startDate = '2002-01-01'
     endDate = '2018-06-14'
@@ -239,5 +239,33 @@ def batchHandle():
         # getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
         # downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
     file.close()  # 关闭文件
+def batchHandleXLS():
+    filename = '明细表.xls'
+    # 打开excel文件
+    sourcedata = xlrd.open_workbook(filename)
+    # 获取第一张工作表（通过索引的方式）
+    sourcetable = sourcedata.sheets()[0]
+    index=0
+    while index<sourcetable.nrows:
+        # data_list用来存放数据
+        lineinfo = []
+        # 将table中第一行的数据读取并添加到data_list中
+        lineinfo.extend(sourcetable.row_values(index))
+        # if((index+1) in [24,35,63,66,67,110,137,]):
+        #     continue
+        id = lineinfo[2].replace(" ","")  # 身份证号码
+        cardNo = lineinfo[1].replace(" ","")  # 卡号
+        username = lineinfo[0].replace(" ","")  # 用户名
+        print(id,"--",cardNo,"--",username)
+        # userid = getCSTM_NO(0, id)
+        # if (userid == -1):
+        #     print(index + 1, username, "未找到记录")
+        #     continue
+        # Acct_Num = getPersonAcct_Num(username, userid, cardNo, startDate, endDate)  # 内部账户
+        # getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
+        # downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
+
+        index=index+1
+
 if __name__ == '__main__':
-    batchHandle()
+    batchHandleXLS()
