@@ -211,7 +211,8 @@ def getTotalNum(username,userId,accountNum,index,startDate,endDate):
 def getSCBICookie():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = 'imoiaRspTopMenuType=big; imoiaRspLoginType=exp; __guid=165233471.4210132586760320500.1526280137524.9197; BIGipServerscbi_report_8002_pool=3456139274.17183.0000; ADMINCONSOLESESSION=xsH9KSMH9Y4cfuXbJINTYEkxRV-lQ7iAiBBgIa7FaHibVJb3WS!-1965563594'
+    cookie_str =\
+        'imoiaRspTopMenuType=big; imoiaRspLoginType=run; __guid=165233471.4210132586760320500.1526280137524.9197; BIGipServerscbi_report_8002_pool=3472916490.17183.0000; ADMINCONSOLESESSION=kDRKu12tQj_NNC22_W4wSbyTI-pcvm2AxTqxA_su_3s9H46ksV!-188926469'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     for line in cookie_str.split(';'):
@@ -240,12 +241,16 @@ def batchHandleCSV():
         # downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
     file.close()  # 关闭文件
 def batchHandleXLS():
-    filename = '明细表.xls'
+
+    startDate = '2011-01-01'
+    endDate = '2018-06-27'
+
+    filename = 'files/客户明细查询附件 (1).xls'
     # 打开excel文件
     sourcedata = xlrd.open_workbook(filename)
     # 获取第一张工作表（通过索引的方式）
     sourcetable = sourcedata.sheets()[0]
-    index=0
+    index=2
     while index<sourcetable.nrows:
         # data_list用来存放数据
         lineinfo = []
@@ -253,17 +258,18 @@ def batchHandleXLS():
         lineinfo.extend(sourcetable.row_values(index))
         # if((index+1) in [24,35,63,66,67,110,137,]):
         #     continue
-        id = lineinfo[2].replace(" ","")  # 身份证号码
-        cardNo = lineinfo[1].replace(" ","")  # 卡号
-        username = lineinfo[0].replace(" ","")  # 用户名
-        print(id,"--",cardNo,"--",username)
+        # id = lineinfo[2].replace(" ","")  # 身份证号码
+        cardNo = lineinfo[3].replace(" ","")  # 卡号
+        username = lineinfo[2].replace(" ","")  # 用户名
         # userid = getCSTM_NO(0, id)
-        # if (userid == -1):
-        #     print(index + 1, username, "未找到记录")
-        #     continue
-        # Acct_Num = getPersonAcct_Num(username, userid, cardNo, startDate, endDate)  # 内部账户
-        # getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
-        # downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
+        userid=lineinfo[1].replace(" ","")#客户号
+        print("--",username,"-",userid)
+        if (userid == -1):
+            print(index + 1, username, "未找到记录")
+            continue
+        Acct_Num = getPersonAcct_Num(username, userid, cardNo, startDate, endDate)  # 内部账户
+        getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
+        downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
 
         index=index+1
 
