@@ -3,16 +3,7 @@ import sys
 import io
 import json
 import xlrd
-def getCookies():
-    # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
-    # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = r'__guid=199830062.2154591976785360000.1526609124348.26; JSESSIONID=45zLbvTfs2f87FLVTGGPbXj42LKcQlrSF1vmrBB9jrKpX9QT5GpH!1947543175'
-    # 把cookie字符串处理成字典，以便接下来使用
-    cookies = {}
-    for line in cookie_str.split(';'):
-        key, value = line.split('=', 1)
-        cookies[key] = value
-    return cookies
+
 def postDwr(index,id):
     headers = {
         'content-type': 'text/plain',
@@ -38,7 +29,7 @@ def postDwr(index,id):
         'c0-e2':'Object_Condition:{fieldName:reference:c0-e3, oper:reference:c0-e4, value1:reference:c0-e5, value2:reference:c0-e6}',
         'c0-e8':'string:VALUE',
         'c0-e9':'string:oper_equal',
-        'c0-e10':'string:'+id,
+        'c0-e10':'string:'+str(id),
         'c0-e11':'string:',
         'c0-e7':'Object_Condition:{fieldName:reference:c0-e8, oper:reference:c0-e9, value1:reference:c0-e10, value2:reference:c0-e11}',
         'c0-e13':'string:MODLEID',
@@ -59,7 +50,7 @@ def postDwr(index,id):
         'c1-e18':'Object_Condition:{fieldName:reference:c1-e19, oper:reference:c1-e20, value1:reference:c1-e21, value2:reference:c1-e22}',
         'c1-e24':'string:VALUE',
         'c1-e25':'string:oper_equal',
-        'c1-e26':'string:'+id,
+        'c1-e26':'string:'+str(id),
         'c1-e27':'string:',
         'c1-e23':'Object_Condition:{fieldName:reference:c1-e24, oper:reference:c1-e25, value1:reference:c1-e26, value2:reference:c1-e27}',
         'c1-e29':'string:MODLEID',
@@ -72,7 +63,7 @@ def postDwr(index,id):
         'c1-param1':'null:null',
         'batchId':'7',
     }
-    resp = requests.post(url, params, headers=headers, cookies=getCookies())
+    resp = requests.post(url, params, headers=headers, cookies=getScomCookies())
     persioninfo = resp.content.decode('unicode-escape')
     return persioninfo
 def getCSTM_NO(index,id):
@@ -116,9 +107,9 @@ def downloadFile(userid,Acct_Num,username,index,startDate,endDate):
               'p_card_no_RTRN_SQL_INFO': '##null',
               }
     response=requests.post(url,params, headers=headers, cookies=getSCBICookie())
-    open("监察委查询名单/"+str(index)+username+"【new】存款交易明细_对客.xls","wb").write(response.content)
+    open("查询名单/"+str(index)+username+"【new】存款交易明细_对客.xls","wb").write(response.content)
     return
-#获取用户信息
+#内部账户
 def getPersonAcct_Num(username,userId,cardNo,startDate,endDate):
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'Accept-Encoding': 'gzip, deflate',
@@ -155,7 +146,7 @@ def getPersonAcct_Num(username,userId,cardNo,startDate,endDate):
     # 在发送get请求时带上请求头和cookies
     resp = requests.post(url, params, headers=headers, cookies=getSCBICookie())
     persioninfo = resp.content.decode('utf-8')
-    # print(persioninfo)
+    #print(persioninfo)
     info=json.loads(persioninfo)
     rows=info['rows']
     index=0
@@ -205,14 +196,23 @@ def getTotalNum(username,userId,accountNum,index,startDate,endDate):
     resp = requests.post(url, params, headers=headers, cookies=getSCBICookie())
     persioninfo = resp.content.decode('utf-8')
     info=json.loads(persioninfo)
-    print(str(index)+"----"+username+"------"+str(info["total"])+"------"+accountNum)
-    return
-
+    # print(info)
+    return info["total"]
+def getScomCookies():
+    # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
+    # 浏览器登录后得到的cookie，也就是刚才复制的字符串
+    cookie_str = r'JSESSIONID=PYXycdSW103QP8ZLJFRvbkDn8LhyqQZPHT4h81J07Bg8fHlgvwB3!-1534195959'
+    # 把cookie字符串处理成字典，以便接下来使用
+    cookies = {}
+    for line in cookie_str.split(';'):
+        key, value = line.split('=', 1)
+        cookies[key] = value
+    return cookies
 def getSCBICookie():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
     cookie_str =\
-        'imoiaRspTopMenuType=big; imoiaRspLoginType=run; __guid=165233471.4210132586760320500.1526280137524.9197; BIGipServerscbi_report_8002_pool=3472916490.17183.0000; ADMINCONSOLESESSION=kDRKu12tQj_NNC22_W4wSbyTI-pcvm2AxTqxA_su_3s9H46ksV!-188926469'
+        'imoiaRspTopMenuType=small; imoiaRspLoginName=760504; imoiaRspLoginType=run; ADMINCONSOLESESSION=j_e_jtq5HrJ27YHb1U7TfMTt3TQPVkoTa9Hwb7F3onLWgx9k4W!2111011142; BIGipServerscbi_report_8002_pool=3456139274.17183.0000'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     for line in cookie_str.split(';'):
@@ -222,17 +222,19 @@ def getSCBICookie():
 def batchHandleCSV():
     file = open("明细表.csv", "r")  # 打开文件
     startDate = '2002-01-01'
-    endDate = '2018-06-14'
+    endDate = '2018-07-25'
 
     for index, line in enumerate(file.readlines()):
         # if((index+1) in [24,35,63,66,67,110,137,]):
         #     continue
         line = line.replace(" ", "")
         lineinfo = line.strip().split(",")
-        id = lineinfo[2]  # 身份证号码
+        #id = lineinfo[2]  # 身份证号码
         cardNo = lineinfo[1]  # 卡号
         username = lineinfo[0]  # 用户名
-        userid = getCSTM_NO(0, id)
+
+        # 0身份证号码     1客户号    2卡号
+        userid = getCSTM_NO(2, cardNo)
         if (userid == -1):
             print(index + 1, username, "未找到记录")
             continue
@@ -242,36 +244,41 @@ def batchHandleCSV():
     file.close()  # 关闭文件
 def batchHandleXLS():
 
-    startDate = '2011-01-01'
-    endDate = '2018-06-27'
+    startDate = '2016-11-26'
+    endDate = '2016-12-11'
 
-    filename = 'files/客户明细查询附件 (1).xls'
+    filename = 'files/受理查询账户明细需求表.xls'
     # 打开excel文件
     sourcedata = xlrd.open_workbook(filename)
     # 获取第一张工作表（通过索引的方式）
     sourcetable = sourcedata.sheets()[0]
-    index=2
+    index=1
     while index<sourcetable.nrows:
         # data_list用来存放数据
         lineinfo = []
         # 将table中第一行的数据读取并添加到data_list中
         lineinfo.extend(sourcetable.row_values(index))
-        # if((index+1) in [24,35,63,66,67,110,137,]):
-        #     continue
-        # id = lineinfo[2].replace(" ","")  # 身份证号码
-        cardNo = lineinfo[3].replace(" ","")  # 卡号
-        username = lineinfo[2].replace(" ","")  # 用户名
-        # userid = getCSTM_NO(0, id)
-        userid=lineinfo[1].replace(" ","")#客户号
-        print("--",username,"-",userid)
+        id = lineinfo[1].replace(" ","")  # 身份证号码
+        # cardNo = lineinfo[1].replace(" ","")  # 卡号
+        cardNo = "" # 卡号  查所有
+        username = lineinfo[0].replace(" ","")  # 用户名
+        # 0身份证号码     1客户号    2卡号
+        userid = getCSTM_NO(0, id)
+        # userid=lineinfo[1].replace(" ","")#客户号
+        print(index+1,username,id, end=' ')
         if (userid == -1):
-            print(index + 1, username, "未找到记录")
-            continue
-        Acct_Num = getPersonAcct_Num(username, userid, cardNo, startDate, endDate)  # 内部账户
-        getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
-        downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
+            print("未找到记录", end=' ')
+        else:
+            if cardNo=="":
+                Acct_Num=""
+            else:
+                Acct_Num = getPersonAcct_Num(username, userid, cardNo, startDate, endDate)  # 内部账户
+            totalnum=getTotalNum(username, userid, Acct_Num, index + 1, startDate, endDate)
+            print(userid,Acct_Num,totalnum, end=' ')
+            downloadFile(userid, Acct_Num, username, index + 1, startDate, endDate)
 
         index=index+1
+        print()
 
 if __name__ == '__main__':
     batchHandleXLS()

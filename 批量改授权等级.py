@@ -7,7 +7,7 @@ import time
 def getCookies():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = r'__guid=199830062.2154591976785360000.1526609124348.26; JSESSIONID=kgcKb1nLTDyy523pR1Jff1cpY8RYF9MdtvDX9Kd1QDHLtsh56K4Z!-404869194'
+    cookie_str = r'__guid=199830062.2154591976785360000.1526609124348.26; JSESSIONID=vQWpbFRVp9PxZPpjSdVNfN9yxk6Zv6Vm1sXGptSDTmNj64kjbjv8!-404869194'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     for line in cookie_str.split(';'):
@@ -51,14 +51,39 @@ def getCustomInfo(pageIndex,pageSize):
     }
     resp = requests.post(url, params, headers=headers, cookies=getCookies())
     persioninfo = resp.content.decode('unicode-escape')
-    print(persioninfo)
+    # print(persioninfo)
     return persioninfo
-def handleCustomInfo(info):
-    pat=r'''s([1-9]|10)\['INST_NO'\]="(.*?)"'''
-    customlist=re.findall(pat,info)
-    print(customlist)
-    return str
+def parseInfo(info):
+    val = {}
+    i = 1
+    while (i != 0):
+        pat = r's' + str(i) + r'''\['(.*?)'\]="(.*?)"'''
+        customlist = re.findall(pat, info)
+        if (len(customlist) == 0):
+            i = 0
+            break
+        list = {}
+        for l in customlist:
+            list[l[0]] = l[1]
+        val[i - 1] = list
+        i = i + 1
+        # print(customlist)
+    return val
+def handleCustomInfo(value):
+    for index in value:
+        if((int(value[index]['INST_NO'])>=7571) & (int(value[index]['INST_NO'])<=7703)):
+            if((int(value[index]['INST_NO'])!=7702)&(int(value[index]['INST_NO'])!=7575)):
+                if(value[index]['TLR_LVL']=='4'):
+                    print(value[index]['TLR_NAME'],"-----",value[index]['TLR_NO'],'-----------',value[index]['INST_NO'])
 
 if __name__ == '__main__':
-    info=getCustomInfo(0,20)
-    handleCustomInfo(info)
+    length=1
+    pageIndex=1
+    while length!=0:
+        print("-------------------------------------------------------第",pageIndex,"页---------------------------------------------------------------")
+        info=getCustomInfo((pageIndex-1)*10,10)
+        value=parseInfo(info)
+        handleCustomInfo(value)
+
+        pageIndex=pageIndex+1
+        length=len(value)

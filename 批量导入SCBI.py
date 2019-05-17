@@ -3,7 +3,7 @@ import sys
 import io
 import json
 import xlrd
-
+import re
 def dataGrid(userId):
     headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
                'Accept-Encoding': 'gzip, deflate',
@@ -107,15 +107,43 @@ def addResource(userid):
                'funcname': 'XtzzhBP.add',
                'intryid': '2010181830',
                'intxtzyid': '141',
-                'nextpage': '%2FSCMDM%2Fjsp%2Fryjggl%2Fxtzzhlst.jsp%3Fintryid%3D2010181830%26strzh%3D761604%26strryxm%3D%B3%C2%C5%F4',
+                'nextpage': '%2FSCMDM%2Fjsp%2Fryjggl%2Fxtzzhlst.jsp%3Fintryid%3D2010181830%26strzh%'+userid+'%26strryxm%3D%B3%C2%C5%F4',
                 'strxtzh': userid,
                 'trans': '1'
                 }
     # 在发送get请求时带上请求头和cookies
     resp = requests.post(url, params, headers=headers, cookies=getOACookie())
     persioninfo = resp.content.decode('GBK')
-    index=persioninfo.index("alert(")
-    print(userid,"---",persioninfo[index+8:index+18])
+    pat = r'''alert\((.*?)\);'''
+    s=re.search(pat,persioninfo).group()
+    print(s)
+    return
+# 添加系统资源
+def delResource(userid):
+    headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
+               'Accept-Encoding': 'gzip, deflate',
+               'Accept-Language': 'zh-CN,zh;q=0.8',
+               'Connection': 'keep-alive',
+               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+               'Host': '10.128.1.137:8002',
+               'User-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+               }
+    # 登录后才能访问的网页
+    url = 'http://10.128.1.20:8001/SCMDM/jsp/commonInvokeAction.do'
+    # 查询个人信息
+    params = {
+               'funcname': 'XtzzhBP.del',
+               'intxtzyid': '141',
+                'nextpage': '%2FSCMDM%2Fjsp%2Fryjggl%2Fxtzzhlst.jsp%3Fintryid%3D2010181830%26strzh%'+userid+'%26strryxm%3D%B3%C2%C5%F4',
+                'strxtzh': userid,
+                'trans': '1'
+                }
+    # 在发送get请求时带上请求头和cookies
+    resp = requests.post(url, params, headers=headers, cookies=getOACookie())
+    persioninfo = resp.content.decode('GBK')
+    pat = r'''alert\((.*?)\);'''
+    s=re.search(pat,persioninfo).group()
+    print(s)
     return
 def getSCBICookie():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
@@ -130,11 +158,10 @@ def getSCBICookie():
 def getOACookie():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = 'BIGipServerscmdm_pool=453017610.16671.0000;SCMDM_JSESSIONID=zVV9brhbMd5jQvwvSP27kBtNQ6r4KNrKjkBnPJSvFTkHg4QRtLs5!1399423705'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     cookies["BIGipServerscmdm_pool"] = '453017610.16671.0000'
-    cookies["SCMDM_JSESSIONID"] = 'zVV9brhbMd5jQvwvSP27kBtNQ6r4KNrKjkBnPJSvFTkHg4QRtLs5!1399423705'
+    cookies["SCMDM_JSESSIONID"] = 'H1TqbHJNLCs08MQmr1myrWJkgFQHvSHMDNgndYyW8F1vRYjtJLB0!1399423705'
     return cookies
 def getBranchName(branchID):
     file = open("files/获取机构名称", "r")  # 打开文件
@@ -148,7 +175,45 @@ def getBranchName(branchID):
             return val["text"]
 
     file.close()  # 关闭文件
-
+def searchByUserNo(userid):
+    # headers = {'Accept': 'image/gif, image/jpeg, image/pjpeg, application/x-ms-application, application/xaml+xml, application/x-ms-xbap, */*',
+    #            'Accept-Encoding': 'gzip, deflate',
+    #            'Accept-Language': 'zh-CN',
+    #            'Connection': 'Keep-Alive',
+    #
+    #            # 'Content - Length': '121',
+    #            'Content-Type': 'application/x-www-form-urlencoded',
+    #            'Cookie': 'BIGipServerscmdm_pool=453017610.16671.0000; SCMDM_JSESSIONID=82fkbHKbT75spkZwyBG8JpJh5FD3XCmgj9dJbtLnpzcpj123J9hc!1399423705',
+    #            'Host': '10.128.1.20:8001',
+    #            'Referer': 'http://10.128.1.20:8001/SCMDM/jsp/ryjggl/tree/jgygtreeshow.jsp?key=strnbjgbz=1@stryxxzbz=2@intjgyglx=0@strjgccbm=00010015@intcxtjlx=0@strhzjgxsbz=0',
+    #            'User-agent': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 10.0; WOW64; Trident/7.0; .NET4.0C; .NET4.0E; .NET CLR 2.0.50727; .NET CLR 3.0.30729; .NET CLR 3.5.30729; InfoPath.3)',
+    #            }
+    headers = {'Accept': 'application/json, text/javascript, */*; q=0.01',
+               'Accept-Encoding': 'gzip, deflate',
+               'Accept-Language': 'zh-CN,zh;q=0.8',
+               'Connection': 'keep-alive',
+               'Cookie': 'BIGipServerscmdm_pool=453017610.16671.0000; SCMDM_JSESSIONID=bdmGbHfpyQGjWQpJ1bHfktlX0L2sR4fnrjdCQK5n6lRy011L9g40!1399423705',
+               'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+               'Host': '10.128.1.20:8001',
+               'Referer': 'http://10.128.1.20:8001/SCMDM/jsp/ryjggl/tree/jgygtreeshow.jsp?key=strnbjgbz=1@stryxxzbz=2@intjgyglx=0@strjgccbm=00010015@intcxtjlx=0@strhzjgxsbz=0',
+               'User-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+               }
+    # 登录后才能访问的网页
+    url = 'http://10.128.1.20:8001/SCMDM/jsp/ryjggl/tree/jgyglist.jsp'
+    # 查询个人信息
+    params = {
+       'key': 'strnbjgbz%3D1@intjgyglx%3D0@stryxxzbz%3D2@strjgccbm%3D00010015@intcxtjlx%3D0@strhzjgxsbz%3D0',
+       'strcxlx': '3',
+        'strdwmc': userid,
+    }
+    # 在发送get请求时带上请求头和cookies
+    resp = requests.post(url, params, headers=headers)
+    persioninfo = resp.content.decode('GBK')
+    pat = r'''<div class="dtxs">(.*?)>'''
+    print(persioninfo)
+    s = re.findall(pat, persioninfo)
+    print(s)
+    return
 def batchHandleXLS():
     filename = 'files/申请事项（巴州区支行）.xlsx'
     # 打开excel文件
@@ -170,7 +235,7 @@ def batchHandleXLS():
         # userRunRoleSave(userid)
 
         #添加系统资源
-        addResource(userid)
+        delResource(userid)
 
         index=index+1
 
@@ -182,4 +247,6 @@ if __name__ == '__main__':
     # save(userinfo)
     # userRunRoleSave(userid)
 
-    batchHandleXLS()
+    # batchHandleXLS()
+    # addResource('764705')
+    searchByUserNo('760504')
