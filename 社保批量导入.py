@@ -29,7 +29,7 @@ def query(id):
 def getCookies():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = r'j_username=513026197506273371; POSTID=0.5928329116928106; insert_cookie=52705030; JSESSIONID=uVXAHlA3OKUj3zSJmw4MKek-3ONJcanIxqW-zGETRymGX_03_WZv!1170114990'
+    cookie_str = r'j_username=513701198807206231; POSTID=0.1831233838913925; insert_cookie=27740876; JSESSIONID=2UPZFmIvPV83w8LR5actaNQv8FKJD0ldQ1fMT9mBQu_bc2HUl00N!1573105332'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     for line in cookie_str.split(';'):
@@ -47,12 +47,12 @@ def saveinfo(name,id,addr,img,phone,file):
         sexid="1"
         sex="男"
     birthday=id[6:10]+"-"+id[10:12]+"-"+id[12:14]
-    bankid="C1347951000687"
-    bankname="巴中农村商业银行股份有限公司福星分理处"
+    bankid="C1347951000507"
+    bankname="巴中农村商业银行股份有限公司来龙分理处"
     areaid="511902"
     areaname="巴州区"
-    # areaid = "511903"
-    # areaname = "恩阳区"
+    areaid = "511903"
+    areaname = "恩阳区"
     # print(id,"-",sex)
     payload = {
         "dto['yh']": "",
@@ -161,7 +161,7 @@ def batchHandleXLS(filename,img):
     sourcedata = xlrd.open_workbook(filename+".xls")
     # 获取第一张工作表（通过索引的方式）
     sourcetable = sourcedata.sheets()[0]
-    index = 0
+    index = 484
     f = open(filename+'.txt', 'w')
     while index < sourcetable.nrows:
         # data_list用来存放数据
@@ -191,7 +191,7 @@ if __name__ == '__main__':
     # print(img)
 
     # query("511902200110249528")
-    batchHandleXLS('files/社保待录信息/福星分理处社保信息',img)
+    batchHandleXLS('files/社保待录信息/来龙分理处社保信息表',img)
     # batchHandleXLS('files/社保待录信息/檬子河村',img)
     # f = open('test.txt', 'w')
     # saveinfo('李雪', '513701199808207222', '巴中市巴州区平梁镇青包山村3组',img,f)
