@@ -29,7 +29,6 @@ def query(id):
 def getCookies():
     # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf8')  # 改变标准输出的默认编码
     # 浏览器登录后得到的cookie，也就是刚才复制的字符串
-    cookie_str = r'j_username=513701198807206231; POSTID=0.1831233838913925; insert_cookie=27740876; JSESSIONID=2UPZFmIvPV83w8LR5actaNQv8FKJD0ldQ1fMT9mBQu_bc2HUl00N!1573105332'
     # 把cookie字符串处理成字典，以便接下来使用
     cookies = {}
     for line in cookie_str.split(';'):
@@ -37,9 +36,8 @@ def getCookies():
         cookies[key] = value
     return cookies
 
-def saveinfo(name,id,addr,img,phone,file):
+def saveinfo(name,id,addr,img,phone,num,file):
     """男生：1 女生：2"""
-    num = int(id[16:17])
     if num % 2 == 0:
         sexid="2"
         sex="女"
@@ -47,12 +45,6 @@ def saveinfo(name,id,addr,img,phone,file):
         sexid="1"
         sex="男"
     birthday=id[6:10]+"-"+id[10:12]+"-"+id[12:14]
-    bankid="C1347951000507"
-    bankname="巴中农村商业银行股份有限公司来龙分理处"
-    areaid="511902"
-    areaname="巴州区"
-    areaid = "511903"
-    areaname = "恩阳区"
     # print(id,"-",sex)
     payload = {
         "dto['yh']": "",
@@ -158,10 +150,10 @@ def getage(number):
     return current - year
 def batchHandleXLS(filename,img):
     # 打开excel文件
-    sourcedata = xlrd.open_workbook(filename+".xls")
+    sourcedata = xlrd.open_workbook(filename+".xlsx")
     # 获取第一张工作表（通过索引的方式）
     sourcetable = sourcedata.sheets()[0]
-    index = 484
+    index = 7529
     f = open(filename+'.txt', 'w')
     while index < sourcetable.nrows:
         # data_list用来存放数据
@@ -172,26 +164,49 @@ def batchHandleXLS(filename,img):
         username = lineinfo[0].replace(" ", "")  # 用户名
         id = lineinfo[1].replace(" ","")  # 身份证号码
         addr = lineinfo[2].replace(" ", "") # 地址
-        try:
-            phone = str(lineinfo[3])  # 电话号码
-        except:
-            phone=""
-        if phone=="":
-            phone="13800000000"
-        age=getage(id)
-        if(age>=0 and age<=50):
-            saveinfo(username,id,addr,img,"13800000000",f)
-            # print(index+1,"-",username,"-",id,"-",phone,"-")
+        # addr = "巴中市巴州区光辉乡" # 地址
+        if username!="" and id!="" and len(id)==18:
+            age=0
+            sex=0
+            try:
+                phone = str(lineinfo[3])  # 电话号码
+                current = int(time.strftime("%Y"))
+                year = int(id[6:10])
+                age= current - year
+            except:
+                phone=""
+            try:
+                current = int(time.strftime("%Y"))
+                year = int(id[6:10])
+                age= current - year
+                sex = int(id[16:17])
+            except :
+                print("------------------------")
+                index = index + 1
+                continue
+            if phone=="" or len(phone)!=11:
+                phone="13800000000"
+
+            if(age>=0 and age<=70):
+                saveinfo(username,id,addr,img,phone,sex,f)
+                # print(index+1,"-",username,"-",id,"-",phone,"-",addr,"-",int(id[16:17]))
 
         index = index + 1
     f.close()
+
+bankid="C3011651000624"
+bankname="南江县农村信用合作联社小河信用社"
+areaid = "511901"
+areaname = "巴中市市本级"
+cookie_str = r'j_username=787304; POSTID=0.26720790376539527; insert_cookie=74418815; JSESSIONID=yy5ONnmRqAYc6t1uPRF1FfggTuuuUy7y-Bkl8yjnRQ2Dkv5Yq9UB!1700560995'
+
 if __name__ == '__main__':
     file=open('files/社保待录信息/photoBack.png','rb')
     img=base64.b64encode(file.read())
     # print(img)
 
     # query("511902200110249528")
-    batchHandleXLS('files/社保待录信息/来龙分理处社保信息表',img)
+    batchHandleXLS('files/社保待录信息/有身份证未开卡汇总',img)
     # batchHandleXLS('files/社保待录信息/檬子河村',img)
     # f = open('test.txt', 'w')
     # saveinfo('李雪', '513701199808207222', '巴中市巴州区平梁镇青包山村3组',img,f)
