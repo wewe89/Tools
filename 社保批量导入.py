@@ -153,7 +153,7 @@ def batchHandleXLS(filename,img):
     sourcedata = xlrd.open_workbook(filename+".xlsx")
     # 获取第一张工作表（通过索引的方式）
     sourcetable = sourcedata.sheets()[0]
-    index = 7529
+    index = 0
     f = open(filename+'.txt', 'w')
     while index < sourcetable.nrows:
         # data_list用来存放数据
@@ -168,11 +168,10 @@ def batchHandleXLS(filename,img):
         if username!="" and id!="" and len(id)==18:
             age=0
             sex=0
+            # phone = str(lineinfo[3])[0:11]  # 电话号码
+            # print(phone)
             try:
-                phone = str(lineinfo[3])  # 电话号码
-                current = int(time.strftime("%Y"))
-                year = int(id[6:10])
-                age= current - year
+                phone = str(lineinfo[3])[0:11]  # 电话号码
             except:
                 phone=""
             try:
@@ -188,8 +187,8 @@ def batchHandleXLS(filename,img):
                 phone="13800000000"
 
             if(age>=0 and age<=70):
-                saveinfo(username,id,addr,img,phone,sex,f)
-                # print(index+1,"-",username,"-",id,"-",phone,"-",addr,"-",int(id[16:17]))
+                # saveinfo(username,id,addr,img,phone,sex,f)
+                print(index+1,"-",username,"-",id,"-",phone,"-",addr,"-",int(id[16:17]))
 
         index = index + 1
     f.close()
@@ -206,7 +205,7 @@ if __name__ == '__main__':
     # print(img)
 
     # query("511902200110249528")
-    batchHandleXLS('files/社保待录信息/有身份证未开卡汇总',img)
+    batchHandleXLS('files/社保待录信息/洪口中学学生办社保卡传信用社基本信息(1)',img)
     # batchHandleXLS('files/社保待录信息/檬子河村',img)
     # f = open('test.txt', 'w')
     # saveinfo('李雪', '513701199808207222', '巴中市巴州区平梁镇青包山村3组',img,f)

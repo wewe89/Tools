@@ -1,69 +1,107 @@
 import xlrd
-import mysql.connector
-import re
-import string
-import time
-def connectdb():
-    print('连接到mysql服务器...')
-    # 打开数据库连接
-    # 用户名:hp, 密码:Hp12345.,用户名和密码需要改成你自己的mysql用户名和密码，并且要创建数据库TESTDB，并在TESTDB数据库中创建好表Student
-    config = {
-        'host': '127.0.0.1',
-        'user': 'root',
-        'password': '123456',
-        'port': 3306,
-        'database': 'shebao',
-        'charset': 'utf8'
-    }
-    db = mysql.connector.connect(**config)
-    print('连接上了!')
-    return db
+import   pandas  as pd
+import numpy
+import openpyxl
 
-def insertShebaodb(db,id_i,mer_seq_id, id, name,pay_amount, create_time,canal_type):
-    # 使用cursor()方法获取操作游标
-    cursor = db.cursor()
-    param = (id_i,mer_seq_id,id,name,pay_amount,create_time,canal_type)
-    # SQL 插入语句
-    sql = 'INSERT INTO shebaoshoufei(id_i,mer_seq_id,id,name,pay_amount,create_time,canal_type) VALUES (%s,%s,%s,%s,%s,%s,%s)'
-    #sql = "INSERT INTO Student(ID, Name, Grade) \
-    #    VALUES ('%s', '%s', '%d')" % \
-    #    ('001', 'HP', 60)
-    try:
-        # 执行sql语句
-        cursor.execute(sql,param)
-        # 提交到数据库执行
-        db.commit()
-    except mysql.connector.Error as e:
-        # Rollback in case there is any error
-        print('query error!{}'.format(e),id_i)
-        db.rollback()
-
-def closedb(db):
-    db.close()
-
-def handleShebaoFile(filename):
-    db = connectdb()    # 连接MySQL数据库
+def search(val):
     # 打开excel文件
-    sourcedata = xlrd.open_workbook(filename)
+    sourcedata = xlrd.open_workbook(r'C:\Users\ZHXY\Desktop\社保局查账\通江.xlsx')
     # 获取第一张工作表（通过索引的方式）
-    sourcetable = sourcedata.sheets()[0]
-
+    sourcetable = sourcedata.sheets()[1]
     index = 0
     while index < sourcetable.nrows:
         # data_list用来存放数据
         data_list = []
         # 将table中第一行的数据读取并添加到data_list中
         data_list.extend(sourcetable.row_values(index))
-        # # print(data_list)
-        # timeArray = time.strptime(tss2, "%Y-%m-%d %H:%M:%S")
-        # # 转为其它显示格式
-        # otherStyleTime = time.strftime("%Y/%m/%d %H:%M:%S", timeArray)
-        # otherStyleTime  # 2013/10/10 23:40:00
-        insertShebaodb(db, index+1,data_list[1], data_list[2], data_list[3], data_list[4], data_list[5], data_list[6])  # 插入数据
-
+        if(str(data_list[5]).replace('\t','')==val):
+            return data_list
         index += 1
+    return
+def xlrdsearch():
+    # 打开excel文件
+    sourcedata = xlrd.open_workbook(r'C:\Users\ZHXY\Desktop\社保局查账\通江\通江代发明细.xlsx')
+    # 获取第一张工作表（通过索引的方式）
+    sourcetable = sourcedata.sheets()[0]
+    file = open("db.sql", "w")
+    index = 1
+    while index < sourcetable.nrows:
+        # data_list用来存放数据
+        data_list = []
+        # 将table中第一行的数据读取并添加到data_list中
+        i = index + 1
+        data_list.extend(sourcetable.row_values(index))
+        val = data_list[0]
+        amount = data_list[1]
+        print(type(val),type(amount))
+        # data = search(val)
+        # line = val + "," + str(amount) + "," + data[2] + "," + data[3] + "," + data[0]
+        # line = str(line).replace('\t', '')
+        # print(line)
+        # file.writelines(line + "\n")
+        index += 1
+    file.close()
+def pdsearch(data,cardno,amount):
 
-    closedb(db)         # 关闭数据库
-
+    # data = pd.DataFrame(pd.read_excel(r'C:\Users\ZHXY\Desktop\社保局查账\通江\通江 - 副本.xlsx', sheet_name='Sheet2'))
+    # print(type(data[u'客户账号'].values[0]), type(data[u'日期'].values[0]), data[u'签约户名'].values[0])
+    # print(data[u'客户账号'].values[0], data[u'日期'].values[0], data[u'签约户名'].values[0])
+    data = data[(data[u'客户账号'] == cardno) & (data[u'申请金额'] == amount)]
+    return data
+def searchjigou(data,pich):
+    # print(data[u'客户账号'].values[0], data[u'日期'].values[0], data[u'签约户名'].values[0])
+    data = data[(data[u'BATCHID'] == pich)]
+    if len(data)==0:
+        return ''
+    else:
+        return data[u'COM_ACC_NAME'].values[0]
+def pdchaxun():
+    pddata = pd.DataFrame(pd.read_excel(r'C:\Users\ZHXY\Desktop\社保局查账\通江\通江.xlsx', sheet_name='Sheet2',
+                                      dtype={u'客户账号': numpy.int64, u'申请金额': numpy.float64, u'日期': numpy.int64}))
+    picidata = pd.DataFrame(pd.read_excel(r'C:\Users\ZHXY\Desktop\社保局查账\0807_5.xls', sheet_name='1',
+                                        dtype={u'BATCHID': numpy.int64}))
+    # 打开excel文件
+    sourcedata = xlrd.open_workbook(r'C:\Users\ZHXY\Desktop\社保局查账\通江\通江代发明细.xlsx')
+    # 获取第一张工作表（通过索引的方式）
+    sourcetable = sourcedata.sheets()[0]
+    file = open("db.sql", "w")
+    index = 1
+    while index < sourcetable.nrows:
+        # data_list用来存放数据
+        data_list = []
+        # 将table中第一行的数据读取并添加到data_list中
+        i = index + 1
+        data_list.extend(sourcetable.row_values(index))
+        cardno = data_list[0]
+        amount = data_list[1]
+        # date=str(data_list[2]).replace("-","")
+        # print(type(cardno), type(date))
+        # print(cardno, amount,date)
+        data = pdsearch(pddata,numpy.int64(cardno),numpy.float64(amount))
+        length = len(data.values)
+        line=''
+        if (length == 0):
+            picihao = ''
+            haoma = ''
+            huming = ''
+            jigou=''
+            # geshu = 0
+        else:
+            for row in data.itertuples():
+                # print(getattr(row,u'批次号'))
+                picihao = getattr(row,u'批次号')
+                haoma = getattr(row,u'证件号码')
+                huming = getattr(row,u'签约户名')
+                riqi=getattr(row,u'日期')
+                jigou=searchjigou(picidata,numpy.int64(picihao))
+                line = cardno + "," + str(amount)+ "," + haoma + "," + huming + "," + str(picihao) + "," + str(jigou)+"," + str(riqi)+"," + str(length)
+        line = str(line).replace('\t', '')
+        print(line)
+        file.writelines(line + "\n")
+        index += 1
+    file.close()
 if __name__ == '__main__':
-    handleShebaoFile("files/社保局明细/新建 XLS 工作表 (2)(3).xls")
+   pdchaxun()
+   # df = pd.DataFrame(pd.read_excel(r'C:\Users\ZHXY\Desktop\社保局查账\通江\通江.xlsx', sheet_name='Sheet2'))
+   # data = df[u'客户账号']
+   # print(type(data.values[0]))
