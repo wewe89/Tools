@@ -29,7 +29,7 @@ def chaxun(work_date,end_stat):
         }
     res = requests.post(url, data=json.dumps(payload),headers=headers,cookies=getCookies())
     return json.loads(res.text)
-cookie_str = r'__guid=199844526.2354567148642618400.1563154117183.0176; JSESSIONID=M5tunqTSio41T7efnBHi9aDyvLSUgNdyxvL_4tgChYt65DVkAIuI!1919125977; monitor_count=35'
+cookie_str = r'__guid=199844526.4473326462402239000.1568861292285.912; JSESSIONID=RihmX_t5DlZjjXzZ6xjgAyOIq-eFf0XCDnJPQ_YxDdVVB1KZmBDP!674897890; monitor_count=18'
 def 批量修改状态(date):
     # "20190729"
     jsontext=chaxun(date,"F")
@@ -43,7 +43,7 @@ import datetime
 import calendar
 def 批量查询():
     start = '20190801'
-    end = '20190802'
+    end = '20190925'
 
     datestart = datetime.datetime.strptime(start, '%Y%m%d')
     dateend = datetime.datetime.strptime(end, '%Y%m%d')
